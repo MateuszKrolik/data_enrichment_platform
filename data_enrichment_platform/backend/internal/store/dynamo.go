@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
 type DynamoStore struct {
@@ -47,7 +48,28 @@ func (d *DynamoStore) CreateJob(job *models.Job, ctx context.Context) error {
 }
 
 func (d *DynamoStore) GetJob(jobId string, ctx context.Context) (*models.Job, error) {
-	panic("unimplemented")
+	key := make(map[string]types.AttributeValue, 1)
+	key["jobId"] = &types.AttributeValueMemberS{Value: jobId}
+
+	result, err := d.client.GetItem(ctx, &dynamodb.GetItemInput{
+		TableName: aws.String(d.tableName),
+		Key:       key,
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get job: %w", err)
+	}
+
+	if result.Item == nil {
+		return nil, fmt.Errorf("Job not found: %s", jobId)
+	}
+
+	var job models.Job
+	if err := attributevalue.UnmarshalMap(result.Item, &job); err != nil {
+		return nil, fmt.Errorf("Failed to unmarshal job: %w", err)
+	}
+
+	return &job, nil
 }
 
 func (d *DynamoStore) UpdateJob(job *models.Job, ctx context.Context) error {

@@ -2,7 +2,8 @@ package store
 
 import (
 	"context"
-	"data_enrichment_platform/internal/models"
+	"data_enrichment_platform/internal/enum"
+	"data_enrichment_platform/internal/model"
 	"log"
 	"os"
 	"testing"
@@ -19,9 +20,9 @@ var jobID string = uuid.MustParse("f6210e35-884c-497f-9809-589635fef083").String
 func TestCreate(t *testing.T) {
 	//GIVEN
 	store, ctx := setupTest(t)
-	job := &models.Job{
+	job := &model.Job{
 		JobID:  jobID,
-		Status: models.Pending,
+		Status: enum.Pending,
 		Input:  make(map[string]string, 1),
 	}
 

@@ -5,6 +5,7 @@ go 1.26.4
 require github.com/aws/aws-sdk-go-v2/config v1.32.25
 
 require (
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.44.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 )

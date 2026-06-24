@@ -2,7 +2,7 @@ package store
 
 import (
 	"context"
-	"data_enrichment_platform/internal/models"
+	"data_enrichment_platform/internal/model"
 	"fmt"
 	"time"
 
@@ -24,7 +24,7 @@ func NewDynamoStore(client *dynamodb.Client, tableName string) Store {
 	}
 }
 
-func (d *DynamoStore) CreateJob(job *models.Job, ctx context.Context) error {
+func (d *DynamoStore) CreateJob(job *model.Job, ctx context.Context) error {
 	job.CreatedAt = time.Now()
 	job.UpdatedAt = time.Now()
 	job.TTL = time.Now().Add(24 * time.Hour).Unix()
@@ -47,7 +47,7 @@ func (d *DynamoStore) CreateJob(job *models.Job, ctx context.Context) error {
 	return nil
 }
 
-func (d *DynamoStore) GetJob(jobId string, ctx context.Context) (*models.Job, error) {
+func (d *DynamoStore) GetJob(jobId string, ctx context.Context) (*model.Job, error) {
 	key := make(map[string]types.AttributeValue, 1)
 	key["jobId"] = &types.AttributeValueMemberS{Value: jobId}
 
@@ -64,7 +64,7 @@ func (d *DynamoStore) GetJob(jobId string, ctx context.Context) (*models.Job, er
 		return nil, fmt.Errorf("Job not found: %s", jobId)
 	}
 
-	var job models.Job
+	var job model.Job
 	if err := attributevalue.UnmarshalMap(result.Item, &job); err != nil {
 		return nil, fmt.Errorf("Failed to unmarshal job: %w", err)
 	}
@@ -72,6 +72,6 @@ func (d *DynamoStore) GetJob(jobId string, ctx context.Context) (*models.Job, er
 	return &job, nil
 }
 
-func (d *DynamoStore) UpdateJob(job *models.Job, ctx context.Context) error {
+func (d *DynamoStore) UpdateJob(job *model.Job, ctx context.Context) error {
 	panic("unimplemented")
 }

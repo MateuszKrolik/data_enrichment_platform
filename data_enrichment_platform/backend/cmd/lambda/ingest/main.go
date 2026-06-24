@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"data_enrichment_platform/internal/handler"
+	"data_enrichment_platform/internal/queue"
 	"data_enrichment_platform/internal/store"
 	"log"
 	"os"
@@ -13,11 +15,14 @@ func main() {
 	ctx := context.Background()
 
 	dynamoClient := store.NewDynamoClient(ctx)
-	db := store.NewDynamoStore(dynamoClient, mustEnv("TABLE_NAME"))
+	sqsClient := queue.NewSQSClient(ctx)
 
-	// TODO: Wire up handler
-	_ = db
-	lambda.Start(func(ctx context.Context) error { return nil })
+	db := store.NewDynamoStore(dynamoClient, mustEnv("TABLE_NAME"))
+	q := queue.NewSQSQueue(sqsClient, mustEnv("QUEUE_NAME"))
+
+	h := handler.NewIngestHandler(db, q)
+
+	lambda.Start(h.Handle)
 }
 
 func mustEnv(key string) string {

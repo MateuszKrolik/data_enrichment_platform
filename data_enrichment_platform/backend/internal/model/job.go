@@ -1,10 +1,13 @@
-package models
+package model
 
-import "time"
+import (
+	"data_enrichment_platform/internal/enum"
+	"time"
+)
 
 type Job struct {
 	JobID     string            `dynamodbav:"jobId"`
-	Status    JobStatus         `dynamodbav:"status"`
+	Status    enum.JobStatus    `dynamodbav:"status"`
 	Input     map[string]string `dynamodbav:"input"`
 	Results   map[string]any    `dynamodbav:"results,omitempty"`
 	Error     string            `dynamodbav:"error,omitempty"`

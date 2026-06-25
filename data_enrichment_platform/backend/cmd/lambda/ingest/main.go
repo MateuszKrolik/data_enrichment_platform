@@ -7,6 +7,7 @@ import (
 	"data_enrichment_platform/internal/store"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -14,11 +15,16 @@ import (
 func main() {
 	ctx := context.Background()
 
-	dynamoClient := store.NewDynamoClient(ctx)
+	isProd, err := strconv.ParseBool(mustEnv("IS_PROD"))
+	if err != nil {
+		log.Fatalf("Invalid 'IS_PROD' environment variable!")
+	}
+
+	dynamoClient := store.NewDynamoClient(ctx, isProd, mustEnv("DYNAMO_BASE_ENDPOINT"))
 	sqsClient := queue.NewSQSClient(ctx)
 
 	db := store.NewDynamoStore(dynamoClient, mustEnv("TABLE_NAME"))
-	q := queue.NewSQSQueue(sqsClient, mustEnv("QUEUE_NAME"))
+	q := queue.NewSQSQueue(sqsClient, mustEnv("QUEUE_URL"))
 
 	h := handler.NewIngestHandler(db, q)
 

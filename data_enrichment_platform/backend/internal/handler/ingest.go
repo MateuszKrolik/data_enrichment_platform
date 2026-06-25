@@ -23,7 +23,7 @@ func NewIngestHandler(s store.Store, q queue.Queue) Handler {
 	}
 }
 
-func (i *IngestHandler) Handle(req events.APIGatewayProxyRequest, ctx context.Context) (events.APIGatewayProxyResponse, error) {
+func (i *IngestHandler) Handle(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	switch req.HTTPMethod {
 	case http.MethodPost:
 		return i.handleSubmitJob(req, ctx)

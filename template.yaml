@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: provided.al2023
+    Architectures: [arm64]
+    Environment:
+      Variables:
+        TABLE_NAME: enrichment-jobs
+        QUEUE_URL: !Ref EnrichmentQueue
+        IS_PROD: "false" 
+        DYNAMO_BASE_ENDPOINT: "http://host.docker.internal:8000"
+
+Resources:
+  IngestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: data_enrichment_platform/backend/cmd/lambda/ingest/
+      Handler: bootstrap
+      Events:
+        Submit:
+          Type: Api
+          Properties:
+            Path: /enrich
+            Method: post
+        GetJob:
+          Type: Api
+          Properties:
+            Path: /jobs/{id}
+            Method: get
+
+  EnrichmentQueue:
+    Type: AWS::SQS::Queue

@@ -7,5 +7,6 @@ import (
 )
 
 type Handler interface {
-	Handle(req events.APIGatewayProxyRequest, ctx context.Context) (events.APIGatewayProxyResponse, error)
+	// Context needs to be first for lambda SAM
+	Handle(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error)
 }
